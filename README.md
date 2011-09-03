@@ -4,4 +4,4 @@ FaceOff is a Chrome Extension to implements the 2-click "like" button as seen on
 
 Here's the Balsamiq mock.
 
-!(FaceOff Mock)(http://hphotos-ash4.fbcdn.net/338261_254771277887855_100000649534996_851164_8066206_o.jpg)
+![FaceOff Mock](http://hphotos-ash4.fbcdn.net/338261_254771277887855_100000649534996_851164_8066206_o.jpg)
