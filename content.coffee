@@ -10,9 +10,20 @@ class LikeButtonShadow
   turn_off: () ->
     @iframe.replaceWith(this.create_custom_button())
   create_custom_button: () ->
-    @custom_button = $("<span class='facebookOff-like'>no like</span>")
+    @custom_button = $("<span class='faceOff-like'></span>")
+    imgURL = chrome.extension.getURL("faceoff-icon.png");
+    @custom_button.css
+     "background": "url(#{imgURL}) 0 0 no-repeat"
+     "height": "24px"
+     "width": "51px"
+     "display": "inline-block"
+    @custom_button.bind "mouseenter", () =>
+      @custom_button.css "background-position": "0 -25px"
+    @custom_button.bind "mouseleave", () =>
+      @custom_button.css "background-position": "0 0"
     @custom_button.bind "click", () =>
       this.turn_on()
+
     return @custom_button
   reload_iframe: () ->
     # replace the old iframe with a clone

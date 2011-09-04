@@ -13,7 +13,25 @@
       return this.iframe.replaceWith(this.create_custom_button());
     };
     LikeButtonShadow.prototype.create_custom_button = function() {
-      this.custom_button = $("<span class='facebookOff-like'>no like</span>");
+      var imgURL;
+      this.custom_button = $("<span class='faceOff-like'></span>");
+      imgURL = chrome.extension.getURL("faceoff-icon.png");
+      this.custom_button.css({
+        "background": "url(" + imgURL + ") 0 0 no-repeat",
+        "height": "24px",
+        "width": "51px",
+        "display": "inline-block"
+      });
+      this.custom_button.bind("mouseenter", __bind(function() {
+        return this.custom_button.css({
+          "background-position": "0 -25px"
+        });
+      }, this));
+      this.custom_button.bind("mouseleave", __bind(function() {
+        return this.custom_button.css({
+          "background-position": "0 0"
+        });
+      }, this));
       this.custom_button.bind("click", __bind(function() {
         return this.turn_on();
       }, this));
