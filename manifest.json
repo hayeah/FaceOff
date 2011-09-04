@@ -1,0 +1,18 @@
+{
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": ["jquery-1.6.2.min.js", "content.js" ],
+      "matches": [ "http://*/*", "https://*/*" ],
+      "run_at": "document_start"
+   } ],
+   "description": "Stop Facebook from tracking the webpages you go to.",
+   // "icons": {
+   //    "128": "128.png",
+   //    "16": "16.png",
+   //    "48": "48.png"
+   // },
+   // "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDk4UprGSIHGNRo2loYk3lUv3G8RTEtTO/vpXP1LPTBnodFFuxS8FmVJ3ycG5HrIOA4F3ycC/qHsQ18Vz2nh1GXal0Ea45pOK6/15AXAOHH6mz9rfVB5E4DaUXBAfoDZovxgJ/8tTluyW1AoaWgWvDmzTp/mBf9gNqgaYTT1qqAgQIDAQAB",
+   "name": "FacebookOff",
+   "update_url": "http://clients2.google.com/service/update2/crx",
+   "version": "1.0.2"
+}
