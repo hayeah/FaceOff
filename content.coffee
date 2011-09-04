@@ -23,7 +23,6 @@ class LikeButtonShadow
       @custom_button.css "background-position": "0 0"
     @custom_button.bind "click", () =>
       this.turn_on()
-
     return @custom_button
   reload_iframe: () ->
     # replace the old iframe with a clone
@@ -33,12 +32,27 @@ class LikeButtonShadow
   turn_on: () ->
     this.reload_iframe()
     @custom_button.replaceWith @iframe
+    @iframe.hide()
+    this.show_spinner()
+    @iframe.load () =>
+      this.hide_spinner()
+      @iframe.show()
+  show_spinner: () ->
+    @spinner = $("<img/>")
+    imgURL = chrome.extension.getURL("loader.gif")
+    @spinner.attr("src",imgURL)
+    @iframe.before(@spinner)
+  hide_spinner: () ->
+    @spinner.remove()
+    @spinner = null
+
+
+
 
 like_button_beforeload = (event) ->
   iframe = event.target
   # second time we attempt to load this iframe. let proceed
-  if shadow = iframe[SECRET]
-    shadow.turn_on()
+  if iframe[SECRET]
     return true
   else
     new LikeButtonShadow(iframe)

@@ -2,7 +2,7 @@
    "content_scripts": [ {
       "all_frames": true,
       "js": ["jquery-1.6.2.min.js", "content.js" ],
-      "matches": [ "http://*/*", "https://*/*" ],
+      "matches": [ "http://*/*", "https://*/*", "file://*/*" ],
       "run_at": "document_start"
    } ],
    "description": "Stop Facebook from tracking you. 2-clicks Like Button.",

@@ -43,15 +43,31 @@
     };
     LikeButtonShadow.prototype.turn_on = function() {
       this.reload_iframe();
-      return this.custom_button.replaceWith(this.iframe);
+      this.custom_button.replaceWith(this.iframe);
+      this.iframe.hide();
+      this.show_spinner();
+      return this.iframe.load(__bind(function() {
+        this.hide_spinner();
+        return this.iframe.show();
+      }, this));
+    };
+    LikeButtonShadow.prototype.show_spinner = function() {
+      var imgURL;
+      this.spinner = $("<img/>");
+      imgURL = chrome.extension.getURL("loader.gif");
+      this.spinner.attr("src", imgURL);
+      return this.iframe.before(this.spinner);
+    };
+    LikeButtonShadow.prototype.hide_spinner = function() {
+      this.spinner.remove();
+      return this.spinner = null;
     };
     return LikeButtonShadow;
   })();
   like_button_beforeload = function(event) {
-    var iframe, shadow;
+    var iframe;
     iframe = event.target;
-    if (shadow = iframe[SECRET]) {
-      shadow.turn_on();
+    if (iframe[SECRET]) {
       return true;
     } else {
       new LikeButtonShadow(iframe);
