@@ -24,7 +24,7 @@
       });
       this.custom_button.bind("mouseenter", __bind(function() {
         return this.custom_button.css({
-          "background-position": "0 -25px"
+          "background-position": "0 -24px"
         });
       }, this));
       this.custom_button.bind("mouseleave", __bind(function() {

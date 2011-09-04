@@ -18,7 +18,7 @@ class LikeButtonShadow
      "width": "51px"
      "display": "inline-block"
     @custom_button.bind "mouseenter", () =>
-      @custom_button.css "background-position": "0 -25px"
+      @custom_button.css "background-position": "0 -24px"
     @custom_button.bind "mouseleave", () =>
       @custom_button.css "background-position": "0 0"
     @custom_button.bind "click", () =>
