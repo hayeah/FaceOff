@@ -45,9 +45,9 @@ class FakeLike
     @spinner.attr("src",imgURL)
     @fake_button.before(@spinner)
 
-class LikeButtonShadow # TODO LikeIFrame
-  constructor: (button) ->
-    @button = $(button)
+class LikeIFrame
+  constructor: (iframe) ->
+    @button = $(iframe)
     @fake = new FakeLike(@button, => @turn_on())
   reload_iframe: () ->
     # replace the old iframe with a clone
@@ -92,7 +92,7 @@ like_button_beforeload = (event) ->
   if iframe[SECRET]
     return true
   else
-    new LikeButtonShadow(iframe)
+    new LikeIFrame(iframe)
     event.preventDefault()
     return false
 

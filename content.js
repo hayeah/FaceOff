@@ -1,5 +1,5 @@
 (function() {
-  var DEBUG, DOMAIN_RE, FBLikeTag, FakeLike, LikeButtonShadow, SECRET, XFBML, console, facebook_off, like_button_beforeload, p, sdk_beforeload;
+  var DEBUG, DOMAIN_RE, FBLikeTag, FakeLike, LikeIFrame, SECRET, XFBML, console, facebook_off, like_button_beforeload, p, sdk_beforeload;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   DEBUG = true;
   if (!DEBUG) {
@@ -63,19 +63,19 @@
     };
     return FakeLike;
   })();
-  LikeButtonShadow = (function() {
-    function LikeButtonShadow(button) {
-      this.button = $(button);
+  LikeIFrame = (function() {
+    function LikeIFrame(iframe) {
+      this.button = $(iframe);
       this.fake = new FakeLike(this.button, __bind(function() {
         return this.turn_on();
       }, this));
     }
-    LikeButtonShadow.prototype.reload_iframe = function() {
+    LikeIFrame.prototype.reload_iframe = function() {
       this.button = this.button.clone();
       this.button[0][SECRET] = this;
       return this.button.hide();
     };
-    LikeButtonShadow.prototype.turn_on = function() {
+    LikeIFrame.prototype.turn_on = function() {
       this.reload_iframe();
       this.fake.loading(this.button);
       return this.button.load(__bind(function() {
@@ -83,7 +83,7 @@
         return this.fake.loaded();
       }, this));
     };
-    return LikeButtonShadow;
+    return LikeIFrame;
   })();
   FBLikeTag = (function() {
     function FBLikeTag(tag) {
@@ -131,7 +131,7 @@
     if (iframe[SECRET]) {
       return true;
     } else {
-      new LikeButtonShadow(iframe);
+      new LikeIFrame(iframe);
       event.preventDefault();
       return false;
     }
