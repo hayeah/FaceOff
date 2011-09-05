@@ -9,7 +9,7 @@ else
 
 p = (o) -> console.log(o)
 
-DOMAIN_RE = /^https?:\/\/(www\.)?(facebook.com|facebook.net|fbcdn.net|connect.facebook)/i
+DOMAIN_RE = /^https?:\/\/(www\.)?(facebook\.com|facebook\.net|fbcdn\.net|connect\.facebook)/i
 
 LOAD = SECRET = "" + Math.random()
 
