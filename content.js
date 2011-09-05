@@ -2,7 +2,7 @@
   var $, DEBUG, DOMAIN_RE, FBLikeTag, FakeLike, LOAD, LikeIFrame, SECRET, XFBML, console, facebook_off, like_button_beforeload, make_loadable, p, sdk_beforeload;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   $ = jQuery;
-  DEBUG = true;
+  DEBUG = false;
   if (!DEBUG) {
     console = {};
     console.log = function() {};

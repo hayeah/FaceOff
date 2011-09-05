@@ -1,5 +1,5 @@
 $ = jQuery
-DEBUG = true
+DEBUG = false
 
 if !DEBUG
   console = {}
