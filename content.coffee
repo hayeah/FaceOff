@@ -1,4 +1,12 @@
-DOMAIN_RE = /^https?:\/\/(www\.)?(facebook.com|facebook.net|fbcdn.net)/i
+DEBUG = true
+
+if !DEBUG
+  console = {}
+  console.log = ->
+else
+  console = window.console
+
+
 
 SECRET = "" + Math.random()
 
