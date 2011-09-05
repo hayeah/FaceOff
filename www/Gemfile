@@ -1,0 +1,4 @@
+gem "sinatra"
+gem "sinatra-reloader"
+
+source 'http://rubygems.org'
