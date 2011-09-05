@@ -1,6 +1,7 @@
 (function() {
-  var DEBUG, DOMAIN_RE, FBLikeTag, FakeLike, LikeIFrame, SECRET, XFBML, console, facebook_off, like_button_beforeload, p, sdk_beforeload;
+  var $, DEBUG, DOMAIN_RE, FBLikeTag, FakeLike, LOAD, LikeIFrame, SECRET, XFBML, console, facebook_off, like_button_beforeload, make_loadable, p, sdk, sdk_beforeload, trap;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  $ = jQuery;
   DEBUG = true;
   if (!DEBUG) {
     console = {};
@@ -12,7 +13,13 @@
     return console.log(o);
   };
   DOMAIN_RE = /^https?:\/\/(www\.)?(facebook.com|facebook.net|fbcdn.net|connect.facebook)/i;
-  SECRET = "" + Math.random();
+  LOAD = SECRET = "" + Math.random();
+  make_loadable = function(o) {
+    if (o.constructor === jQuery) {
+      o = o[0];
+    }
+    return o[LOAD] = true;
+  };
   FakeLike = (function() {
     function FakeLike(button, onclick) {
       this.trigger = onclick;
@@ -86,25 +93,30 @@
     return LikeIFrame;
   })();
   FBLikeTag = (function() {
-    function FBLikeTag(tag) {
+    function FBLikeTag(tag, sdk) {
+      this.sdk = sdk;
       this.tag = $(tag);
       this.fake = new FakeLike(this.tag, __bind(function() {
         return this.turn_on();
       }, this));
     }
     FBLikeTag.prototype.turn_on = function() {
-      return setTimeout(__bind(function() {
-        return this.display();
-      }, this), 2000);
+      return this.sdk.load();
     };
-    FBLikeTag.prototype.display = function() {
-      return this.fake.loaded($("<div>Great Success</div>"));
+    FBLikeTag.prototype.loading = function() {
+      this.tag.hide();
+      return this.fake.loading(this.tag);
+    };
+    FBLikeTag.prototype.loaded = function() {
+      this.tag.show();
+      return this.fake.loaded();
     };
     return FBLikeTag;
   })();
   XFBML = (function() {
     function XFBML(script) {
-      this.script = script;
+      this.script = $(script);
+      this.script.detach();
       $(document).ready(__bind(function() {
         return this.prevent_loading();
       }, this));
@@ -113,15 +125,60 @@
       return this.replace_likes();
     };
     XFBML.prototype.replace_likes = function() {
-      var likes, tag, _i, _len, _results;
+      var likes, tag;
       likes = $("fb\\:like");
-      console.log(likes);
+      return this.likes = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = likes.length; _i < _len; _i++) {
+          tag = likes[_i];
+          _results.push(new FBLikeTag(tag, this));
+        }
+        return _results;
+      }).call(this);
+    };
+    XFBML.prototype.load = function() {
+      var tag, _i, _len, _ref;
+      _ref = this.likes;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        tag = _ref[_i];
+        tag.loading();
+      }
+      return this.load_script();
+    };
+    XFBML.prototype.load_script = function() {
+      var script;
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      script = document.createElement('script');
+      script.src = this.script.attr("src");
+      script.addEventListener('load', __bind(function() {
+        return this.sdk_loaded();
+      }, this));
+      return document.head.appendChild(script);
+    };
+    XFBML.prototype.sdk_loaded = function() {
+      var tag, _i, _len, _ref, _results;
+      this.loaded = true;
+      _ref = this.likes;
       _results = [];
-      for (_i = 0, _len = likes.length; _i < _len; _i++) {
-        tag = likes[_i];
-        _results.push(new FBLikeTag(tag));
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        tag = _ref[_i];
+        _results.push(tag.loaded());
       }
       return _results;
+    };
+    XFBML.prototype.when_loaded = function(action) {
+      this.force_load();
+      if (this.loaded === true) {
+        return action();
+      } else {
+        return $(document).bind("sdk_loaded", __bind(function() {
+          return action();
+        }, this));
+      }
     };
     return XFBML;
   })();
@@ -136,25 +193,36 @@
       return false;
     }
   };
+  sdk = false;
   sdk_beforeload = function(event) {
     var script;
     script = event.target;
-    new XFBML(script);
+    sdk = new XFBML(script);
     event.preventDefault();
     return false;
   };
+  trap = false;
   facebook_off = function(event) {
     var md, type;
     if (md = event.url.match(DOMAIN_RE)) {
+      p("attempt:" + event.url);
+      if (event.target[LOAD]) {
+        p("made loadable: " + event.url);
+        return;
+      }
       type = event.target.constructor;
       if (type === HTMLIFrameElement) {
-        console.log("block iframe:", event.url);
+        p("block iframe:" + event.url);
         return like_button_beforeload(event);
       } else if (type === HTMLScriptElement) {
-        console.log("block script:", event.url);
+        if (sdk) {
+          return;
+        }
+        p(event);
+        p("block script:" + event.url);
         return sdk_beforeload(event);
       } else {
-        console.log("block:", event.url);
+        p("block:", event.url);
         return event.preventDefault();
       }
     } else {

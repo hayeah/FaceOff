@@ -1,3 +1,4 @@
+$ = jQuery
 DEBUG = true
 
 if !DEBUG
@@ -10,7 +11,11 @@ p = (o) -> console.log(o)
 
 DOMAIN_RE = /^https?:\/\/(www\.)?(facebook.com|facebook.net|fbcdn.net|connect.facebook)/i
 
-SECRET = "" + Math.random()
+LOAD = SECRET = "" + Math.random()
+
+make_loadable = (o) ->
+  o = o[0] if o.constructor == jQuery
+  o[LOAD] = true
 
 class FakeLike
   constructor: (button,onclick) ->
@@ -63,28 +68,58 @@ class LikeIFrame
       @fake.loaded()
 
 class FBLikeTag
-  constructor: (tag) ->
+  constructor: (tag,sdk) ->
+    @sdk = sdk
     @tag = $(tag)
     @fake = new FakeLike(@tag, => @turn_on())
   turn_on: ->
-    setTimeout \
-      () => @display(),
-      2000
-  display: ->
-    @fake.loaded $("<div>Great Success</div>")
+    @sdk.load()
+  loading: ->
+    @tag.hide()
+    @fake.loading(@tag)
+  loaded: ->
+    @tag.show()
+    @fake.loaded()
 
+
+# defer loading the SDK until FakeLike is clicked on
 class XFBML
   constructor: (script) ->
-    @script = script
+    @script = $(script)
+    @script.detach()
     $(document).ready () =>
       this.prevent_loading()
   prevent_loading: () ->
     this.replace_likes()
   replace_likes: () ->
     likes = $("fb\\:like")
-    console.log likes
-    for tag in likes
-      new FBLikeTag(tag)
+    @likes = for tag in likes
+      new FBLikeTag(tag,this)
+  load: () ->
+    for tag in @likes
+      tag.loading()
+    this.load_script()
+  load_script: () ->
+    return if @loading
+    @loading = true
+    # create script in content script's js environment, so we can access FB stuff
+    ## actually, this doesn't work :\
+    script = document.createElement('script')
+    script.src = @script.attr("src")
+    script.addEventListener 'load',  => this.sdk_loaded()
+    document.head.appendChild(script)
+  sdk_loaded: ->
+    @loaded = true
+    for tag in @likes
+      tag.loaded()
+  when_loaded: (action) ->
+    this.force_load()
+    if @loaded == true
+      action()
+    else
+      $(document).bind "sdk_loaded", () =>
+        action()
+
 
 like_button_beforeload = (event) ->
   iframe = event.target
@@ -96,25 +131,37 @@ like_button_beforeload = (event) ->
     event.preventDefault()
     return false
 
+sdk = false
 sdk_beforeload = (event) ->
   script = event.target
-  new XFBML(script)
+  sdk = new XFBML(script)
   event.preventDefault()
   return false
 
+trap = false
 facebook_off = (event) ->
   if md = event.url.match(DOMAIN_RE)
+    p("attempt:" + event.url)
+    if event.target[LOAD]
+      p "made loadable: #{event.url}"
+      return
     type = event.target.constructor
     if type == HTMLIFrameElement
       # replace if it's the like button iframe
       # TODO detect URL for like.php
-      console.log("block iframe:", event.url)
+      p("block iframe:" + event.url)
       like_button_beforeload(event)
     else if type == HTMLScriptElement
-      console.log("block script:", event.url)
+      if sdk
+        # sdk.script.trigger("load")
+        # $(event.target).load () ->
+        #   $(document).trigger("sdk_loaded")
+        return
+      p event
+      p("block script:" + event.url)
       sdk_beforeload(event)
     else
-      console.log("block:", event.url)
+      p("block:", event.url)
       # block everything else from facebook
       event.preventDefault()
   else
