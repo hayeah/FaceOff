@@ -17,107 +17,71 @@
     function FakeLike(button, onclick) {
       this.trigger = onclick;
       this.button = button;
-      this.create_fake_button();
+      this.fake_button = this.create_fake_button();
       this.button.replaceWith(this.fake_button);
     }
     FakeLike.prototype.create_fake_button = function() {
-      var imgURL;
-      this.fake_button = $("<span class='faceOff-like'></span>");
+      var button, imgURL;
+      button = $("<span class='faceOff-like'></span>");
       imgURL = chrome.extension.getURL("faceoff-icon.png");
-      this.fake_button.css({
+      button.css({
         "background": "url(" + imgURL + ") 0 0 no-repeat",
         "height": "24px",
         "width": "51px",
         "display": "inline-block"
       });
-      this.fake_button.bind("mouseenter", __bind(function() {
-        return this.fake_button.css({
+      button.bind("mouseenter", __bind(function() {
+        return button.css({
           "background-position": "0 -24px"
         });
       }, this));
-      this.fake_button.bind("mouseleave", __bind(function() {
-        return this.fake_button.css({
+      button.bind("mouseleave", __bind(function() {
+        return button.css({
           "background-position": "0 0"
         });
       }, this));
-      this.fake_button.click(__bind(function(e) {
-        this.loading();
+      button.click(__bind(function(e) {
         return this.trigger(e);
       }, this));
-      return this.fake_button;
+      return button;
     };
-    FakeLike.prototype.loading = function() {
+    FakeLike.prototype.loading = function(element) {
+      this.show_spinner();
+      this.fake_button.replaceWith($(element));
+      return this.fake_button = null;
+    };
+    FakeLike.prototype.loaded = function() {
+      this.spinner.remove();
+      return this.spinner = null;
+    };
+    FakeLike.prototype.show_spinner = function() {
       var imgURL;
       this.spinner = $("<img/>");
       imgURL = chrome.extension.getURL("loader.gif");
       this.spinner.attr("src", imgURL);
-      this.fake_button.replaceWith(this.spinner);
-      return this.fake_button = null;
-    };
-    FakeLike.prototype.loaded = function(element) {
-      this.spinner.replaceWith(element);
-      return this.spinner = null;
+      return this.fake_button.before(this.spinner);
     };
     return FakeLike;
   })();
   LikeButtonShadow = (function() {
-    function LikeButtonShadow(iframe) {
-      iframe.shadow = this;
-      this.iframe = $(iframe);
-      this.turn_off();
-    }
-    LikeButtonShadow.prototype.turn_off = function() {
-      return this.iframe.replaceWith(this.create_custom_button());
-    };
-    LikeButtonShadow.prototype.create_custom_button = function() {
-      var imgURL;
-      this.custom_button = $("<span class='faceOff-like'></span>");
-      imgURL = chrome.extension.getURL("faceoff-icon.png");
-      this.custom_button.css({
-        "background": "url(" + imgURL + ") 0 0 no-repeat",
-        "height": "24px",
-        "width": "51px",
-        "display": "inline-block"
-      });
-      this.custom_button.bind("mouseenter", __bind(function() {
-        return this.custom_button.css({
-          "background-position": "0 -24px"
-        });
-      }, this));
-      this.custom_button.bind("mouseleave", __bind(function() {
-        return this.custom_button.css({
-          "background-position": "0 0"
-        });
-      }, this));
-      this.custom_button.bind("click", __bind(function() {
+    function LikeButtonShadow(button) {
+      this.button = $(button);
+      this.fake = new FakeLike(this.button, __bind(function() {
         return this.turn_on();
       }, this));
-      return this.custom_button;
-    };
+    }
     LikeButtonShadow.prototype.reload_iframe = function() {
-      this.iframe = this.iframe.clone();
-      return this.iframe[0][SECRET] = this;
+      this.button = this.button.clone();
+      this.button[0][SECRET] = this;
+      return this.button.hide();
     };
     LikeButtonShadow.prototype.turn_on = function() {
       this.reload_iframe();
-      this.custom_button.replaceWith(this.iframe);
-      this.iframe.hide();
-      this.show_spinner();
-      return this.iframe.load(__bind(function() {
-        this.hide_spinner();
-        return this.iframe.show();
+      this.fake.loading(this.button);
+      return this.button.load(__bind(function() {
+        this.button.show();
+        return this.fake.loaded();
       }, this));
-    };
-    LikeButtonShadow.prototype.show_spinner = function() {
-      var imgURL;
-      this.spinner = $("<img/>");
-      imgURL = chrome.extension.getURL("loader.gif");
-      this.spinner.attr("src", imgURL);
-      return this.iframe.before(this.spinner);
-    };
-    LikeButtonShadow.prototype.hide_spinner = function() {
-      this.spinner.remove();
-      return this.spinner = null;
     };
     return LikeButtonShadow;
   })();

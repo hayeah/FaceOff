@@ -45,49 +45,22 @@ class FakeLike
     @spinner.attr("src",imgURL)
     @fake_button.before(@spinner)
 
-class LikeButtonShadow
-  constructor: (iframe) ->
-    iframe.shadow = this
-    @iframe = $(iframe)
-    this.turn_off()
-  turn_off: () ->
-    @iframe.replaceWith(this.create_custom_button())
-  create_custom_button: () ->
-    @custom_button = $("<span class='faceOff-like'></span>")
-    imgURL = chrome.extension.getURL("faceoff-icon.png");
-    @custom_button.css
-     "background": "url(#{imgURL}) 0 0 no-repeat"
-     "height": "24px"
-     "width": "51px"
-     "display": "inline-block"
-    @custom_button.bind "mouseenter", () =>
-      @custom_button.css "background-position": "0 -24px"
-    @custom_button.bind "mouseleave", () =>
-      @custom_button.css "background-position": "0 0"
-    @custom_button.bind "click", () =>
-      this.turn_on()
-    return @custom_button
+class LikeButtonShadow # TODO LikeIFrame
+  constructor: (button) ->
+    @button = $(button)
+    @fake = new FakeLike(@button, => @turn_on())
   reload_iframe: () ->
     # replace the old iframe with a clone
-    @iframe = @iframe.clone()
+    @button = @button.clone()
     # store the secret on the iframe object so it actually loads
-    @iframe[0][SECRET] = this
+    @button[0][SECRET] = this
+    @button.hide()
   turn_on: () ->
     this.reload_iframe()
-    @custom_button.replaceWith @iframe
-    @iframe.hide()
-    this.show_spinner()
-    @iframe.load () =>
-      this.hide_spinner()
-      @iframe.show()
-  show_spinner: () ->
-    @spinner = $("<img/>")
-    imgURL = chrome.extension.getURL("loader.gif")
-    @spinner.attr("src",imgURL)
-    @iframe.before(@spinner)
-  hide_spinner: () ->
-    @spinner.remove()
-    @spinner = null
+    @fake.loading(@button)
+    @button.load () =>
+      @button.show()
+      @fake.loaded()
 
 class FBLikeTag
   constructor: (tag) ->
