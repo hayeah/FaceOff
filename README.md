@@ -1,6 +1,6 @@
 # FaceOff
 
-For now, you can get the packaged extension here: [download](http://dl.dropbox.com/u/1052278/FaceOff.crx). If you installed it, please let me know. Or if you encounter you can rub it in my face [@hayeah](http://twitter.com/hayeah).
+For now, you can get the packaged extension here: [download](http://dl.dropbox.com/u/1052278/FaceOff.crx). If you installed it, please let me know. Or if you encounter bugs, you can rub it in my face [@hayeah](http://twitter.com/hayeah).
 
 FaceOff is a Chrome Extension to implements the 2-click "like" button as seen on the [German tech-news site Heise](http://www.heise.de/ct/artikel/2-Klicks-fuer-mehr-Datenschutz-1333879.html).
 
