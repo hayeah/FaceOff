@@ -1,5 +1,5 @@
 (function() {
-  var $, DEBUG, DOMAIN_RE, FBLikeTag, FakeLike, LOAD, LikeIFrame, SECRET, XFBML, console, facebook_off, like_button_beforeload, make_loadable, p, sdk, sdk_beforeload, trap;
+  var $, DEBUG, DOMAIN_RE, FBLikeTag, FakeLike, LOAD, LikeIFrame, SECRET, XFBML, console, facebook_off, like_button_beforeload, make_loadable, p, sdk_beforeload;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   $ = jQuery;
   DEBUG = true;
@@ -148,10 +148,10 @@
     };
     XFBML.prototype.load_script = function() {
       var script;
-      if (this.loading) {
+      if (XFBML[LOAD]) {
         return;
       }
-      this.loading = true;
+      XFBML[LOAD] = true;
       script = document.createElement('script');
       script.src = this.script.attr("src");
       script.addEventListener('load', __bind(function() {
@@ -170,16 +170,6 @@
       }
       return _results;
     };
-    XFBML.prototype.when_loaded = function(action) {
-      this.force_load();
-      if (this.loaded === true) {
-        return action();
-      } else {
-        return $(document).bind("sdk_loaded", __bind(function() {
-          return action();
-        }, this));
-      }
-    };
     return XFBML;
   })();
   like_button_beforeload = function(event) {
@@ -193,15 +183,13 @@
       return false;
     }
   };
-  sdk = false;
   sdk_beforeload = function(event) {
-    var script;
+    var script, sdk;
     script = event.target;
     sdk = new XFBML(script);
     event.preventDefault();
     return false;
   };
-  trap = false;
   facebook_off = function(event) {
     var md, type;
     if (md = event.url.match(DOMAIN_RE)) {
@@ -215,10 +203,9 @@
         p("block iframe:" + event.url);
         return like_button_beforeload(event);
       } else if (type === HTMLScriptElement) {
-        if (sdk) {
+        if (XFBML[LOAD]) {
           return;
         }
-        p(event);
         p("block script:" + event.url);
         return sdk_beforeload(event);
       } else {

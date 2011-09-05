@@ -100,8 +100,8 @@ class XFBML
       tag.loading()
     this.load_script()
   load_script: () ->
-    return if @loading
-    @loading = true
+    return if XFBML[LOAD]
+    XFBML[LOAD] = true
     # create script in content script's js environment, so we can access FB stuff
     ## actually, this doesn't work :\
     script = document.createElement('script')
@@ -110,16 +110,7 @@ class XFBML
     document.head.appendChild(script)
   sdk_loaded: ->
     @loaded = true
-    for tag in @likes
-      tag.loaded()
-  when_loaded: (action) ->
-    this.force_load()
-    if @loaded == true
-      action()
-    else
-      $(document).bind "sdk_loaded", () =>
-        action()
-
+    tag.loaded() for tag in @likes
 
 like_button_beforeload = (event) ->
   iframe = event.target
@@ -131,14 +122,12 @@ like_button_beforeload = (event) ->
     event.preventDefault()
     return false
 
-sdk = false
 sdk_beforeload = (event) ->
   script = event.target
   sdk = new XFBML(script)
   event.preventDefault()
   return false
 
-trap = false
 facebook_off = (event) ->
   if md = event.url.match(DOMAIN_RE)
     p("attempt:" + event.url)
@@ -152,12 +141,7 @@ facebook_off = (event) ->
       p("block iframe:" + event.url)
       like_button_beforeload(event)
     else if type == HTMLScriptElement
-      if sdk
-        # sdk.script.trigger("load")
-        # $(event.target).load () ->
-        #   $(document).trigger("sdk_loaded")
-        return
-      p event
+      return if XFBML[LOAD]
       p("block script:" + event.url)
       sdk_beforeload(event)
     else
