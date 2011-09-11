@@ -2,8 +2,10 @@
    "content_scripts": [ {
       "all_frames": true,
       "js": ["jquery-1.6.2.min.js", "content.js" ],
-      "matches": [ "http://*/*", "https://*/*", "file://*/*" ],
-      "exclude_matches": [ "http://*.facebook.com/*", "https://*.facebook.com/*" ],
+      // "matches": [ "http://*/*", "https://*/*", "file://*/*" ],
+      "matches": ["*://*/*","file://*/*" ],
+      // wtf this doesn't work...
+      // "exclude_matches": ["http://www.facebook.com/","*://*.facebook.com/*"],
       "run_at": "document_start"
    } ],
    "description": "Stop Facebook from tracking you. 2-clicks Like Button.",
@@ -15,5 +17,5 @@
    // "key": null,
    "name": "FaceOff",
    // "update_url": null,
-   "version": "0.1.0"
+   "version": "0.1.1"
 }

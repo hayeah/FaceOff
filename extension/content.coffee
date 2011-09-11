@@ -1,5 +1,9 @@
-$ = jQuery
+# FIXME. I can't seem to get exlucde_matches to work properly
+return if window.location.toString().match(/https?:\/\/.*\.facebook\.com\//)
+
 DEBUG = false
+
+$ = jQuery
 
 if !DEBUG
   console = {}
@@ -8,6 +12,9 @@ else
   console = window.console
 
 p = (o) -> console.log(o)
+
+p "loading extension: #{window.location}"
+
 
 DOMAIN_RE = /^https?:\/\/(www\.)?(facebook\.com|facebook\.net|fbcdn\.net|connect\.facebook)/i
 

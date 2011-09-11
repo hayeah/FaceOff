@@ -1,8 +1,11 @@
 (function() {
   var $, DEBUG, DOMAIN_RE, FBLikeTag, FakeLike, LOAD, LikeIFrame, SECRET, XFBML, console, facebook_off, like_button_beforeload, make_loadable, p, sdk_beforeload;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  $ = jQuery;
+  if (window.location.toString().match(/https?:\/\/.*\.facebook\.com\//)) {
+    return;
+  }
   DEBUG = false;
+  $ = jQuery;
   if (!DEBUG) {
     console = {};
     console.log = function() {};
@@ -12,6 +15,7 @@
   p = function(o) {
     return console.log(o);
   };
+  p("loading extension: " + window.location);
   DOMAIN_RE = /^https?:\/\/(www\.)?(facebook\.com|facebook\.net|fbcdn\.net|connect\.facebook)/i;
   LOAD = SECRET = "" + Math.random();
   make_loadable = function(o) {
